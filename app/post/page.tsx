@@ -1,4 +1,4 @@
-import HeaderPage from "../components/HeaderPage";
+import HeaderPage from "../../components/HeaderPage";
 
 export default function first() {
     return (
