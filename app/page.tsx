@@ -161,7 +161,6 @@ export default function first() {
                     </div>
                 </div>
             </div>
-
         </section>
     )
 }
