@@ -21,6 +21,23 @@ export async function createPost(data: any) {
   return await res.json();
 }
 
+export async function createLike(id: number, data: any) {
+  const res = await fetch(`${BASE_URL}/storelike/${id}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+
+  const text = await res.text();
+
+  try {
+    return JSON.parse(text);
+  } catch (err) {
+    throw new Error(`Invalid JSON: ${text}`);
+  }
+}
+
+
 export async function updatePost(id: number, data: any) {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: 'PUT',

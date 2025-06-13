@@ -47,15 +47,20 @@ export default function first() {
             </div>
             {/* post */}
             <div className="flex flex-col gap-4">
-                {posts.map(post => 
-                    <PostCard 
-                        key={post.post_id} 
-                        index={post.post_id} 
-                        name={post.user.name}
-                        about={post.user.about}
-                        text={post.text}
-                    />
-                )}
+                {posts.map(post => {
+                    const isLikedByMe = post.likes.some(like => like.user_id === 1); 
+                    return (
+                        <PostCard 
+                            key={post.post_id} 
+                            index={post.post_id} 
+                            name={post.user.name}
+                            about={post.user.about}
+                            text={post.text}
+                            countlike={post.likes.length}
+                            isLikedByMe={isLikedByMe}
+                        />
+                    )
+                })}
             </div>
         </section>
     )

@@ -1,3 +1,4 @@
+import { usePostActions } from "@/hooks/usePostAction";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -6,9 +7,12 @@ interface PostCardProps {
     name: string;
     about: string;
     text: string;
+    countlike: number;
+    isLikedByMe: boolean;
 }
 
-export default function CardPost({ index, name, about, text }: PostCardProps) {
+export default function CardPost({ index, name, about, text, countlike, isLikedByMe }: PostCardProps) {
+    const { handleLike } = usePostActions();
     return (
         <div key={index} className="card flex flex-col items-center w-full border border-gray-100/30 rounded-lg">
             <div className="flex justify-between w-full items-center px-4 bg-gray-100/10 py-3 rounded-t-lg">
@@ -32,9 +36,14 @@ export default function CardPost({ index, name, about, text }: PostCardProps) {
                 <p className="text-sm">{text}</p>
             </div>
             <div className="flex items-center justify-start w-full gap-4 px-4 pt-3">
-                <div className="flex items-center gap-1">
-                    <i className="ri-heart-line text-2xl"></i>
-                    <p>31</p>
+                <div 
+                     onClick={() => handleLike(1,1)}
+                     className="flex items-center gap-1">
+                      <i className={`ri-heart-fill text-2xl transition duration-300 ${
+                            isLikedByMe ? 'text-red-600' : ''
+                        }`}
+                    ></i>
+                    <p>{countlike}</p>
                 </div>
                 <div className="flex items-center gap-1">
                     <i className="ri-chat-2-line text-2xl"></i>

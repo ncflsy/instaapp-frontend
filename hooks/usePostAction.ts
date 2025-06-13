@@ -1,4 +1,4 @@
-import { createPost, updatePost, deletePost } from '../services/postService';
+import { createPost, updatePost, deletePost, createLike } from '../services/postService';
 import { useRouter } from 'next/navigation';
 import { Post } from '../types/post';
 
@@ -10,9 +10,19 @@ export function usePostActions() {
     router.push('/posts');
   };
 
+  const handleLike = async (postId: number, userId: number) => {
+    try {
+      await createLike(postId, { user_id: userId });
+      // Optional: refresh halaman atau update state
+      console.log('Like successful');
+    } catch (error) {
+      console.error('Error liking post:', error);
+    }
+  };
+
   const handleUpdate = async (id: number, data: Partial<Post>) => {
-    await updatePost(id, data);
-    router.push('/posts');
+    await createLike(id, data);
+    router.refresh();
   };
 
   const handleDelete = async (id: number) => {
@@ -20,5 +30,5 @@ export function usePostActions() {
     router.refresh();
   };
 
-  return { handleCreate, handleUpdate, handleDelete };
+  return { handleCreate, handleUpdate, handleDelete, handleLike };
 }
