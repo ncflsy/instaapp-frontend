@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 
-export default function first() {
+export default function ProfilePage() {
     const [activeTab, setActiveTab] = useState<'home' | 'private' | 'save'>('home');
 
     return (

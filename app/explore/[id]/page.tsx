@@ -5,7 +5,7 @@ interface DetailExploreProps {
     };
 }
 
-export default function Page({ params }: DetailExploreProps) {
+export default function DetailExplorePage({ params }: DetailExploreProps) {
     const { id } = params;
     return (
         <section className="p-4">

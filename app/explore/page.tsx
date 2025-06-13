@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function first() {
+export default function Explore() {
     return (
         <section>
             <div className="flex justify-between px-4 py-3 border-b-[1px] border-gray-100/30">

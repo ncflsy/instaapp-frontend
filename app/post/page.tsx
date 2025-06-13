@@ -1,6 +1,6 @@
 import HeaderPage from "../../components/HeaderPage";
 
-export default function first() {
+export default function PostPage() {
     return (
         <section className="p-4">
             <HeaderPage title='Post' href="/explore" action={false}></HeaderPage>
