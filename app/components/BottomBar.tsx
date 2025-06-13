@@ -9,7 +9,7 @@ export default function bottombar() {
             <Link href="/explore">
                 <i className="ri-search-line text-[28px]"></i>
             </Link>
-            <Link href="">
+            <Link href="/post">
                 <div className="border-2 h-6.5 w-7 rounded-lg flex justify-center items-center">
                     <i className="ri-add-fill text-xl"></i>
                 </div>

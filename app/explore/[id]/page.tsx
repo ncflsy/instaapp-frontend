@@ -9,7 +9,7 @@ export default function Page({ params }: DetailExploreProps) {
     const { id } = params;
     return (
         <section className="p-4">
-            <HeaderPage title='Explore' href="/explore"></HeaderPage>
+            <HeaderPage title='Explore' href="/explore" action={true}></HeaderPage>
             <div className="py-4">
                 <div className="card flex flex-col items-center w-full border border-gray-100/30 rounded-lg">
                     <div className="flex justify-between w-full items-center px-4 bg-gray-100/10 py-3 rounded-t-lg">
