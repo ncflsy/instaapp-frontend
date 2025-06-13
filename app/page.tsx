@@ -3,7 +3,7 @@ import { usePosts } from "@/hooks/usePosts";
 import PostCard from "../components/PostCard";
 import Image from "next/image";
 
-export default function first() {
+export default function MainPage() {
     const { posts, loading, error } = usePosts();
 
     if (loading) return <p>Loading...</p>;

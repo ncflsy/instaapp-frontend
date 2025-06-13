@@ -2,15 +2,18 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const { handleLogin, error, loading } = useAuth()
 
-    const handleSubmit = (e: any) => {
-        e.preventDefault();
-        console.log("Login attempt with:", { email, password });
-    };
+
+    const onSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        await handleLogin(email, password)
+    }
 
     return (
         <div className="flex flex-col min-h-screen bg-black text-white">
@@ -27,7 +30,7 @@ export default function Login() {
                         <h1 className="text-3xl font-bold">InstaApp</h1>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form onSubmit={onSubmit} className="space-y-6">
                         <div className="space-y-2">
                             <label htmlFor="email" className="text-zinc-400 block mb-2">
                                 Email atau Username
