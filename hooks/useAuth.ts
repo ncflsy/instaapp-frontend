@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { loginUser } from '../services/auth'
 import { useRouter } from 'next/navigation'
 import { json } from 'stream/consumers'
+import Cookies from 'js-cookie'
 
 export function useAuth() {
   const [error, setError] = useState<string | null>(null)
@@ -16,6 +17,7 @@ export function useAuth() {
     try {
       const res = await loginUser(email, password)
       localStorage.setItem('token', res.token)
+      Cookies.set('token', res.token)
       router.push('/') 
     } catch (err: any) {
       setError(err.message || 'Login gagal')
