@@ -14,7 +14,7 @@ export default function bottombar() {
                     <i className="ri-add-fill text-xl"></i>
                 </div>
             </Link>
-            <Link href="">
+            <Link href="/profile">
                 <div className="w-7 h-7 bg-amber-50 rounded-full"></div>
             </Link>
         </div>
