@@ -2,6 +2,7 @@ import HeaderPage from "../../components/HeaderPage";
 interface DetailExploreProps {
     params: {
         id: string;
+        action: string;
     };
 }
 
