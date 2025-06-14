@@ -95,7 +95,7 @@ export async function createLike(postId: number, data: { user_id: number }) {
   if (!token) {
     throw new Error('No authentication token found');
   }
-  const response = await fetch(`${API_URL}/like/${postId}`, {
+  const response = await fetch(`${API_URL}/post/storelike/${postId}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ export async function createComment(postId: number, data: { user_id: number, com
   if (!token) {
     throw new Error('No authentication token found');
   }
-  const response = await fetch(`${API_URL}/comment/${postId}`, {
+  const response = await fetch(`${API_URL}/post/postcomment/${postId}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
