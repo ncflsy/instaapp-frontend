@@ -15,14 +15,17 @@ interface PostCardProps {
     countlike: number;
     isLikedByMe: boolean;
     comments: Comment[];
+    image?: string;
 }
 
-export default function CardPost({ index, postId, name, about, text, countlike, isLikedByMe, comments }: PostCardProps) {
+export default function CardPost({ index, postId, name, about, text, countlike, isLikedByMe, comments, image }: PostCardProps) {
     const { handleLike, handleComment } = usePostActions();
     const [liked, setLiked] = useState(isLikedByMe);
     const [currentLikeCount, setCurrentLikeCount] = useState(countlike);
     const [newComment, setNewComment] = useState<string>('');
     const [currentComments, setCurrentComments] = useState<Comment[]>(comments);
+
+    const BASE_BACKEND_URL = 'http://192.168.1.6:8000'; // Sesuaikan dengan APP_URL Laravel Anda
 
     const onLike = async () => {
         const userId = getLoggedInUserId();
@@ -103,9 +106,18 @@ export default function CardPost({ index, postId, name, about, text, countlike, 
                     <i className="ri-more-line text-2xl"></i>
                 </div>
             </div>
-            <div className="flex w-full h-[400px] justify-center items-center bg-gray-400">
-                <Image src={`https://picsum.photos/seed/${index + 1}/580/625`} width={380} height={400} alt="post"></Image>
-            </div>
+            {image ? (
+                <div className="flex w-full h-[400px] justify-center items-center bg-gray-400">
+                    <Image 
+                        src={image.startsWith('http') || image.startsWith('https') ? image : `${BASE_BACKEND_URL}/storage/${image}`}
+                        width={380} 
+                        height={400} 
+                        alt="post" 
+                    />
+                </div>
+            ) : (
+                <div className="flex w-full h-[100px] justify-center items-center bg-gray-200/10 text-gray-400">Tidak ada gambar</div>
+            )}
             <div className="px-4 pt-4 w-full text-start">
                 <p className="text-sm">{text}</p>
             </div>
@@ -113,10 +125,7 @@ export default function CardPost({ index, postId, name, about, text, countlike, 
                 <div 
                      onClick={onLike}
                      className="flex items-center gap-1">
-                      <i className={`ri-heart-fill text-2xl transition duration-300 ${
-                            liked ? 'text-red-600' : ''
-                        }`}
-                    ></i>
+                      <i className={`ri-heart-fill text-2xl transition duration-300 ${liked ? 'text-red-600' : ''}`} ></i>
                     <p>{currentLikeCount}</p>
                 </div>
                 <div className="flex items-center gap-1">

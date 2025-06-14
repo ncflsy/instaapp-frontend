@@ -62,6 +62,7 @@ export default function HomePage() {
                             countlike={post.likes.length}
                             isLikedByMe={isLikedByMe}
                             comments={post.comments}
+                            image={post.image}
                         />
                     )
                 })}

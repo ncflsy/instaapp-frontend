@@ -48,7 +48,8 @@ export async function getPosts(): Promise<Post[]> {
   if (!response.ok) {
     throw new Error('Failed to fetch posts');
   }
-  return response.json();
+  const result = await response.json();
+  return result.data; // Mengambil array posts dari properti 'data'
 }
 
 export async function updatePost(id: number, data: Partial<Post>) {

@@ -50,6 +50,8 @@ export default function MainPage() {
             {/* post */}
             <div className="flex flex-col gap-4">
                 {posts.map(post => {
+                    console.log('Post data for PostCard:', post);
+                    console.log('Image prop for PostCard:', post.image);
                     const isLikedByMe = userId ? post.likes.some(like => like.user_id === userId) : false;
                     return (
                         <PostCard 
@@ -62,6 +64,7 @@ export default function MainPage() {
                             countlike={post.likes.length}
                             isLikedByMe={isLikedByMe}
                             comments={post.comments}
+                            image={post.image}
                         />
                     )
                 })}
