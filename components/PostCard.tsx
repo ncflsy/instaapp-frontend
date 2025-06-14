@@ -107,11 +107,11 @@ export default function CardPost({ index, postId, name, about, text, countlike, 
                 </div>
             </div>
             {image ? (
-                <div className="flex w-full h-[400px] justify-center items-center bg-gray-400">
+                <div className="relative flex w-full h-[400px] justify-center items-center bg-gray-400">
                     <Image 
                         src={image.startsWith('http') || image.startsWith('https') ? image : `${BASE_BACKEND_URL}/storage/${image}`}
-                        width={380} 
-                        height={400} 
+                        layout="fill"
+                        objectFit="cover"
                         alt="post" 
                     />
                 </div>
