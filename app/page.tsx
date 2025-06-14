@@ -2,9 +2,11 @@
 import { usePosts } from "@/hooks/usePosts";
 import PostCard from "../components/PostCard";
 import Image from "next/image";
+import { getLoggedInUserId } from "@/utils/authUtils";
 
 export default function MainPage() {
     const { posts, loading, error } = usePosts();
+    const userId = getLoggedInUserId();
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>{error}</p>;
@@ -48,11 +50,12 @@ export default function MainPage() {
             {/* post */}
             <div className="flex flex-col gap-4">
                 {posts.map(post => {
-                    const isLikedByMe = post.likes.some(like => like.user_id === 1); 
+                    const isLikedByMe = userId ? post.likes.some(like => like.user_id === userId) : false;
                     return (
                         <PostCard 
                             key={post.post_id} 
                             index={post.post_id} 
+                            postId={post.post_id}
                             name={post.user.name}
                             about={post.user.about}
                             text={post.text}

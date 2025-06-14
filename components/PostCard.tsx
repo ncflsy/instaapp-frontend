@@ -1,9 +1,13 @@
+'use client';
 import { usePostActions } from "@/hooks/usePostAction";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { getLoggedInUserId } from "@/utils/authUtils";
 
 interface PostCardProps {
     index: number;
+    postId: number;
     name: string;
     about: string;
     text: string;
@@ -11,8 +15,37 @@ interface PostCardProps {
     isLikedByMe: boolean;
 }
 
-export default function CardPost({ index, name, about, text, countlike, isLikedByMe }: PostCardProps) {
+export default function CardPost({ index, postId, name, about, text, countlike, isLikedByMe }: PostCardProps) {
     const { handleLike } = usePostActions();
+    const [liked, setLiked] = useState(isLikedByMe);
+    const [currentLikeCount, setCurrentLikeCount] = useState(countlike);
+
+    const onLike = async () => {
+        const userId = getLoggedInUserId();
+        console.log("User ID from global function:", userId);
+
+        if (userId === null) {
+            alert("Anda harus login untuk melakukan aksi ini.");
+            return;
+        }
+
+        const newLikedState = !liked;
+        const newLikeCount = newLikedState ? currentLikeCount + 1 : currentLikeCount - 1;
+        setLiked(newLikedState);
+        setCurrentLikeCount(newLikeCount);
+
+        try {
+            const response = await handleLike(postId, userId);
+            console.log("Like API response:", response);
+
+        } catch (error) {
+            console.error("Error during like/unlike API call:", error);
+            setLiked(liked);
+            setCurrentLikeCount(currentLikeCount);
+            alert("Gagal melakukan aksi like/unlike. Silakan coba lagi.");
+        }
+    };
+
     return (
         <div key={index} className="card flex flex-col items-center w-full border border-gray-100/30 rounded-lg">
             <div className="flex justify-between w-full items-center px-4 bg-gray-100/10 py-3 rounded-t-lg">
@@ -37,13 +70,13 @@ export default function CardPost({ index, name, about, text, countlike, isLikedB
             </div>
             <div className="flex items-center justify-start w-full gap-4 px-4 pt-3">
                 <div 
-                     onClick={() => handleLike(1,1)}
+                     onClick={onLike}
                      className="flex items-center gap-1">
                       <i className={`ri-heart-fill text-2xl transition duration-300 ${
-                            isLikedByMe ? 'text-red-600' : ''
+                            liked ? 'text-red-600' : ''
                         }`}
                     ></i>
-                    <p>{countlike}</p>
+                    <p>{currentLikeCount}</p>
                 </div>
                 <div className="flex items-center gap-1">
                     <i className="ri-chat-2-line text-2xl"></i>
