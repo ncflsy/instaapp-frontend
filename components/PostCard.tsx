@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getLoggedInUserId } from "@/utils/authUtils";
+import { Comment } from "@/types/post";
 
 interface PostCardProps {
     index: number;
@@ -13,12 +14,15 @@ interface PostCardProps {
     text: string;
     countlike: number;
     isLikedByMe: boolean;
+    comments: Comment[];
 }
 
-export default function CardPost({ index, postId, name, about, text, countlike, isLikedByMe }: PostCardProps) {
-    const { handleLike } = usePostActions();
+export default function CardPost({ index, postId, name, about, text, countlike, isLikedByMe, comments }: PostCardProps) {
+    const { handleLike, handleComment } = usePostActions();
     const [liked, setLiked] = useState(isLikedByMe);
     const [currentLikeCount, setCurrentLikeCount] = useState(countlike);
+    const [newComment, setNewComment] = useState<string>('');
+    const [currentComments, setCurrentComments] = useState<Comment[]>(comments);
 
     const onLike = async () => {
         const userId = getLoggedInUserId();
@@ -37,12 +41,49 @@ export default function CardPost({ index, postId, name, about, text, countlike, 
         try {
             const response = await handleLike(postId, userId);
             console.log("Like API response:", response);
-
         } catch (error) {
             console.error("Error during like/unlike API call:", error);
             setLiked(liked);
             setCurrentLikeCount(currentLikeCount);
             alert("Gagal melakukan aksi like/unlike. Silakan coba lagi.");
+        }
+    };
+
+    const onCommentSubmit = async () => {
+        const userId = getLoggedInUserId();
+        if (userId === null) {
+            alert("Anda harus login untuk memberi komentar.");
+            return;
+        }
+        if (newComment.trim() === '') {
+            alert("Komentar tidak boleh kosong.");
+            return;
+        }
+
+        const commentData = {
+            user_id: userId,
+            comment: newComment.trim(),
+        };
+
+        const tempComment: Comment = {
+            comment_id: Date.now(),
+            user_id: userId,
+            post_id: postId,
+            comment: newComment.trim(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            user: { user_id: userId, name: 'Anda', email: '', email_verified_at: null, followers: 0, following: 0, about: '', web: '', created_at: '', updated_at: '' }
+        };
+        setCurrentComments(prev => [...prev, tempComment]);
+        setNewComment('');
+
+        try {
+            const response = await handleComment(postId, commentData);
+            console.log("Comment API response:", response);
+        } catch (error) {
+            console.error("Error submitting comment:", error);
+            setCurrentComments(prev => prev.filter(c => c.comment_id !== tempComment.comment_id));
+            alert("Gagal menambahkan komentar. Silakan coba lagi.");
         }
     };
 
@@ -80,7 +121,7 @@ export default function CardPost({ index, postId, name, about, text, countlike, 
                 </div>
                 <div className="flex items-center gap-1">
                     <i className="ri-chat-2-line text-2xl"></i>
-                    <p>31</p>
+                    <p>{currentComments.length}</p>
                 </div>
                 <div className="flex items-center gap-1">
                     <i className="ri-bookmark-fill text-2xl"></i>
@@ -92,7 +133,30 @@ export default function CardPost({ index, postId, name, about, text, countlike, 
                 </div>
             </div>
             <div className="px-4 pt-1 pb-4">
-                <p className="text-[13px] text-gray-500">View all 42 comments</p>
+                <p className="text-[13px] text-gray-500">View all {currentComments.length} comments</p>
+            </div>
+            <div className="w-full px-4 mb-2">
+                {currentComments.map((commentItem) => (
+                    <div key={commentItem.comment_id} className="text-sm mb-1">
+                        <span className="font-bold mr-1">{commentItem.user?.name || `User ${commentItem.user_id}`}:</span>
+                        <span>{commentItem.comment}</span>
+                    </div>
+                ))}
+            </div>
+            <div className="w-full flex gap-2 px-4 pb-4">
+                <input
+                    type="text"
+                    placeholder="Tambahkan komentar..."
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    className="flex-1 p-2 bg-gray-800 border border-gray-700 rounded-lg text-white outline-none"
+                />
+                <button 
+                    onClick={onCommentSubmit}
+                    className="bg-red-900 px-4 py-2 rounded-lg text-white font-semibold"
+                >
+                    Kirim
+                </button>
             </div>
         </div>
     );

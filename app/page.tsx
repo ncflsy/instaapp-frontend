@@ -61,6 +61,7 @@ export default function MainPage() {
                             text={post.text}
                             countlike={post.likes.length}
                             isLikedByMe={isLikedByMe}
+                            comments={post.comments}
                         />
                     )
                 })}

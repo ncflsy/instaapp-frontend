@@ -37,6 +37,27 @@ export async function createLike(id: number, data: any) {
   }
 }
 
+export async function createComment(postId: number, data: { user_id: number, comment: string }) {
+  const res = await fetch(`${BASE_URL}/postcomment/${postId}`, {
+    method: 'POST',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({
+      user_id: data.user_id,
+      comment: data.comment
+    }),
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Failed to create comment: ${errorText}`);
+  }
+
+  const json = await res.json();
+  return json;
+}
 
 export async function updatePost(id: number, data: any) {
   const res = await fetch(`${BASE_URL}/${id}`, {
