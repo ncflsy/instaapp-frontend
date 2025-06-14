@@ -5,6 +5,8 @@ import { loginUser } from '../services/auth'
 import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
 
+const API_URL = 'http://192.168.1.6:8000/api';
+
 export function useAuth() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -35,11 +37,44 @@ export function useAuth() {
     }
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    Cookies.remove('token');
-    Cookies.remove('logged_in_user_id');
-    router.push('/login');
+  const handleLogout = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      localStorage.removeItem('token');
+      Cookies.remove('token');
+      Cookies.remove('logged_in_user_id');
+      router.push('/login');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`${API_URL}/logout`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Logout gagal di server.');
+      }
+
+      // Logout berhasil di server, sekarang hapus dari klien
+      localStorage.removeItem('token');
+      Cookies.remove('token');
+      Cookies.remove('logged_in_user_id');
+      router.push('/login');
+
+    } catch (err: any) {
+      console.error("Error during logout:", err);
+      setError(err.message || 'Gagal logout. Silakan coba lagi.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return {

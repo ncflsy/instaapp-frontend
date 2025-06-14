@@ -4,10 +4,12 @@ import PostCard from "../components/PostCard";
 import Image from "next/image";
 import { getLoggedInUserId } from "@/utils/authUtils";
 import Loading from "@/components/Loading";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function MainPage() {
     const { posts, loading, error } = usePosts();
     const userId = getLoggedInUserId();
+    const { handleLogout } = useAuth();
 
     if (loading) return <Loading />;
     if (error) return <p>{error}</p>;
@@ -18,6 +20,11 @@ export default function MainPage() {
             <div className="flex justify-between px-4 py-3 border-b-[1px] border-gray-100/30">
                 <h1 className="text-xl font-semibold">InstaApp</h1>
                 <div className="flex gap-2">
+                     <button 
+                        onClick={handleLogout}
+                        className="text-2xl text-white rounded-lg">
+                        <i className="ri-logout-box-r-line"></i>
+                    </button>
                     <div><i className="ri-notification-3-line text-2xl"></i></div>
                     <div className="relative">
                         <i className="ri-chat-3-line text-2xl"></i>
