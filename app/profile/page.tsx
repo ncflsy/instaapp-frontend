@@ -1,9 +1,47 @@
 'use client';
+import Loading from "@/components/Loading";
+import { useMyPosts } from "@/hooks/useMyPosts";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { getLoggedInUserId } from "@/utils/authUtils";
+import { Post } from "@/types/post";
+
+const BASE_BACKEND_URL = 'http://192.168.1.6:8000';
 
 export default function ProfilePage() {
+    const { myPosts, loading, error } = useMyPosts();
     const [activeTab, setActiveTab] = useState<'home' | 'private' | 'save'>('home');
+    const userId = getLoggedInUserId();
+
+    if (loading) return <Loading />;
+    if (error) return <p>{error}</p>;
+
+    const renderPostGridItem = (post: Post) => {
+        const imageUrl = post.image ? 
+            (post.image.startsWith('http') || post.image.startsWith('https') ? post.image : `${BASE_BACKEND_URL}/storage/${post.image}`) 
+            : null;
+        
+        return (
+            <Link
+                key={post.post_id}
+                href={`/profile/${post.post_id}`}
+                className="w-full aspect-square bg-gray-700 rounded-lg overflow-hidden relative"
+            >
+                {imageUrl ? (
+                    <Image 
+                        src={imageUrl} 
+                        layout="fill" 
+                        objectFit="cover" 
+                        alt="Post Image"
+                        className="rounded-lg"
+                    />
+                ) : (
+                    <div className="flex justify-center items-center w-full h-full text-gray-400 text-xs">No Image</div>
+                )}
+            </Link>
+        );
+    };
 
     return (
         <div className="flex flex-col gap-3">
@@ -42,34 +80,16 @@ export default function ProfilePage() {
                 </div>
                 {activeTab === 'home' && (
                     <div id="tab-home" className="w-full grid grid-cols-3 gap-2 py-3">
-                        <Link href="/profile/1" className="w-full aspect-square bg-gray-300 rounded-sm"></Link>
-                        <div className="w-full aspect-square bg-gray-300 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-300 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-300 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-300 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-300 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-300 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-300 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-300 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-300 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-300 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-300 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-300 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-300 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-300 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-300 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-300 rounded-sm"></div>
+                        {myPosts.filter(post => post.status === 'public').map(myPost => (
+                            renderPostGridItem(myPost)
+                        ))}
                     </div>
                 )}
                 {activeTab === 'private' && (
                     <div id="tab-private" className="w-full grid grid-cols-3 gap-2 py-3">
-                        <Link href="/profile/1" className="w-full aspect-square bg-gray-300 rounded-sm"></Link>
-                        <div className="w-full aspect-square bg-gray-400 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-400 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-400 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-400 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-400 rounded-sm"></div>
-                        <div className="w-full aspect-square bg-gray-400 rounded-sm"></div>
+                        {myPosts.filter(post => post.status === 'private').map(myPost => (
+                            renderPostGridItem(myPost)
+                        ))}
                     </div>
                 )}
                 {activeTab === 'save' && (

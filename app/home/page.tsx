@@ -3,12 +3,13 @@ import { usePosts } from "@/hooks/usePosts";
 import PostCard from "../../components/PostCard";
 import Image from "next/image";
 import { getLoggedInUserId } from "@/utils/authUtils";
+import Loading from "@/components/Loading";
 
 export default function HomePage() {
     const { posts, loading, error } = usePosts();
     const userId = getLoggedInUserId();
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) return <Loading />;
     if (error) return <p>{error}</p>;
 
     return (
