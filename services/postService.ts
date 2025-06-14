@@ -1,74 +1,128 @@
-const BASE_URL = 'http://192.168.1.6:8000/api/post';
+import { Post, Comment } from '../types/post';
 
-export async function getAllPosts() {
-  const res = await fetch(BASE_URL);
-  const json = await res.json();
-  return json.data;
-}
+const API_URL = 'http://192.168.1.6:8000/api';
 
-export async function getPostById(id: number) {
-  const res = await fetch(`${BASE_URL}/${id}`);
-  const json = await res.json();
-  return json.data;
-}
+export const createPost = async (data: { user_id: number, text: string, image?: File, status?: string }) => {
+  console.log('createPost received data:', data); // Debug log
 
-export async function createPost(data: any) {
-  const res = await fetch(BASE_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  return await res.json();
-}
-
-export async function createLike(id: number, data: any) {
-  const res = await fetch(`${BASE_URL}/storelike/${id}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-
-  const text = await res.text();
-
-  try {
-    return JSON.parse(text);
-  } catch (err) {
-    throw new Error(`Invalid JSON: ${text}`);
+  if (!data.user_id) {
+    throw new Error('User ID is required');
   }
-}
 
-export async function createComment(postId: number, data: { user_id: number, comment: string }) {
-  const res = await fetch(`${BASE_URL}/postcomment/${postId}`, {
+  const formData = new FormData();
+  formData.append('user_id', data.user_id.toString());
+  formData.append('text', data.text);
+  formData.append('status', data.status || 'public'); 
+  
+  if (data.image) {
+    formData.append('image', data.image);
+  }
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  console.log('Sending request with FormData:', Object.fromEntries(formData.entries())); // Debug log
+
+  const response = await fetch(`${API_URL}/post`, {
     method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
+    headers: {
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${token}`
     },
-    body: JSON.stringify({
-      user_id: data.user_id,
-      comment: data.comment
-    }),
+    body: formData
   });
 
-  if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(`Failed to create comment: ${errorText}`);
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    console.error('API Error Response:', errorData); // Debug log
+    throw new Error(errorData.message || 'Failed to create post');
   }
 
-  const json = await res.json();
-  return json;
+  return response.json();
+};
+
+export async function getPosts(): Promise<Post[]> {
+  const response = await fetch(`${API_URL}/post`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch posts');
+  }
+  return response.json();
 }
 
-export async function updatePost(id: number, data: any) {
-  const res = await fetch(`${BASE_URL}/${id}`, {
+export async function updatePost(id: number, data: Partial<Post>) {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  const response = await fetch(`${API_URL}/post/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
   });
-  return await res.json();
+  if (!response.ok) {
+    throw new Error('Failed to update post');
+  }
+  return response.json();
 }
 
 export async function deletePost(id: number) {
-  const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' });
-  return await res.json();
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  const response = await fetch(`${API_URL}/post/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete post');
+  }
+  return response.json();
+}
+
+export async function createLike(postId: number, data: { user_id: number }) {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+  const response = await fetch(`${API_URL}/like/${postId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  });
+  if (!response.ok) {
+    throw new Error('Failed to like post');
+  }
+  return response.json();
+}
+
+export async function createComment(postId: number, data: { user_id: number, comment: string }) {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+  const response = await fetch(`${API_URL}/comment/${postId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  });
+  if (!response.ok) {
+    throw new Error('Failed to add comment');
+  }
+  return response.json();
 }

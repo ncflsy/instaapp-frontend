@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { getAllPosts } from '../services/postService';
+import { getPosts } from '../services/postService';
 import { Post } from '../types/post';
 
 export function usePosts() {
@@ -9,7 +9,7 @@ export function usePosts() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    getAllPosts()
+    getPosts()
       .then(setPosts)
       .catch(() => setError('Failed to fetch posts'))
       .finally(() => setLoading(false));
